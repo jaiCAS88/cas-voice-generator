@@ -23,7 +23,7 @@ You are a professional ghostwriter. Rewrite the LinkedIn post below using the fo
 Audience: CPA firm owners or accounting leaders considering offshore staffing.
 
 Your task:
-Rewrite the following post to sound like it came from Jordan, using his tone guide above${tone !== 'Jordan' ? ` with a touch of "${tone}" style` : ''}:
+Rewrite the following post to sound like it came from Jordan, using his tone guide above${tone !== 'No extra style' ? ` with a touch of "${tone}" style` : ''}
 
 "${rawPost}"
 
@@ -87,13 +87,14 @@ Return only the revised version.
   <textarea id="rawPost" rows="6" placeholder="Paste your draft here..."></textarea>
 
   <label for="tone">Tone</label>
-  <select id="tone">
-    <option value="Professional">Friendly</option>
-    <option value="Friendly">Friendly</option>
-    <option value="Sharp">Sharp</option>
-    <option value="Funny">Funny</option>
-    <option value="Empathetic">Empathetic</option>
-  </select>
+<select id="tone">
+  <option value="No extra style">No extra style</option>
+  <option value="Friendly">Friendly</option>
+  <option value="Sharp">Sharp</option>
+  <option value="Funny">Funny</option>
+  <option value="Empathetic">Empathetic</option>
+  <option value="Professional">Professional</option>
+</select>
 
   <button onclick="rewritePost()">Rewrite Post</button>
 
