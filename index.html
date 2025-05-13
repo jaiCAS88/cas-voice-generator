@@ -31,13 +31,32 @@
       margin-top: 1.5rem;
       margin-bottom: 0.5rem;
     }
-    textarea, select, button {
+    textarea {
+      width: calc(100% - 2px);
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+    .flex-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .flex-item {
+      flex: 1;
+      min-width: 200px;
+    }
+    select, button, input[type="range"] {
       width: 100%;
       padding: 1rem;
       font-size: 1rem;
       border-radius: 0.5rem;
       border: 1px solid #d1d5db;
       margin-bottom: 1rem;
+      box-sizing: border-box;
     }
     button {
       background: #4f46e5;
@@ -80,6 +99,12 @@
       border-radius: 0.5rem;
       margin-bottom: 1rem;
     }
+    .tone-description, .voice-description {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -87,25 +112,34 @@
     <h1>CAS Voice Assistant</h1>
 
     <label for="newIdea">🧠 What would you like to write or rewrite?</label>
-    <textarea id="newIdea" rows="6" placeholder="Describe what you want to write..."></textarea>
+    <textarea id="newIdea" rows="6" placeholder="Describe your idea or draft here..."></textarea>
 
-    <label for="voice">🧑 Select a Voice</label>
-    <select id="voice" onchange="toggleToneVisibility()">
-      <option value="Jordan">Jordan</option>
-      <option value="Conner">Conner</option>
-    </select>
+    <div class="flex-row">
+      <div class="flex-item">
+        <label for="voice">🧑 Select a Voice</label>
+        <select id="voice" onchange="updateVoiceToneDescription()">
+          <option value="Jordan">Jordan</option>
+          <option value="Conner">Conner</option>
+        </select>
+        <div id="voiceDescription" class="voice-description">Conversational and forward-looking</div>
+      </div>
 
-    <div id="toneWrapper">
-      <label for="tone">🎨 Select a Tone (optional)</label>
-      <select id="tone">
-        <option value="No extra style">No extra style</option>
-        <option value="Friendly">Friendly</option>
-        <option value="Sharp">Sharp</option>
-        <option value="Funny">Funny</option>
-        <option value="Empathetic">Empathetic</option>
-        <option value="Professional">Professional</option>
-      </select>
+      <div class="flex-item">
+        <label for="tone">🎨 Select a Tone (optional)</label>
+        <select id="tone" onchange="updateVoiceToneDescription()">
+          <option value="No extra style">No extra style</option>
+          <option value="Friendly">Friendly</option>
+          <option value="Sharp">Sharp</option>
+          <option value="Funny">Funny</option>
+          <option value="Empathetic">Empathetic</option>
+          <option value="Professional">Professional</option>
+        </select>
+        <div id="toneDescription" class="tone-description">Warm and kind language</div>
+      </div>
     </div>
+
+    <label for="toneStrength">Tone Strength</label>
+    <input type="range" id="toneStrength" min="0" max="100" value="50" style="width: calc(100% - 2px);">
 
     <button onclick="generatePost()">Generate or Rewrite</button>
 
@@ -119,20 +153,32 @@
   </div>
 
   <script>
-    const output = document.getElementById("output");
-    const historyLog = document.getElementById("historyLog");
+    function updateVoiceToneDescription() {
+      const toneDescriptions = {
+        "No extra style": "",
+        "Friendly": "Warm and kind language",
+        "Sharp": "Direct, punchy, confident. Less fluff.",
+        "Funny": "Clever analogies, casual jokes, emoji play",
+        "Empathetic": "Supportive, reflective, emotionally aware",
+        "Professional": "Polished, respectful, slightly formal"
+      };
 
-    function toggleToneVisibility() {
-      document.getElementById("toneWrapper").style.display = "block";
+      const voiceDescriptions = {
+        "Jordan": "Conversational and forward-looking",
+        "Conner": "Witty and direct"
+      };
+
+      const voice = document.getElementById("voice").value;
+      const tone = document.getElementById("tone").value;
+
+      document.getElementById("voiceDescription").innerText = voiceDescriptions[voice] || "";
+      document.getElementById("toneDescription").innerText = toneDescriptions[tone] || "";
     }
-
-    function copyToClipboard() {
-      const text = output.textContent;
-      navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
-    }
-
+  
     function getToneTag(tone) {
-      return tone !== "No extra style" ? `Apply an additional tone of \"${tone}\".` : "Use only the selected voice's natural tone.";
+      return tone !== "No extra style"
+        ? `Apply an additional tone of "${tone}".`
+        : "Use only the selected voice's natural tone.";
     }
 
     function getVoiceGuide(voice) {
@@ -145,7 +191,6 @@
 - Creative & Engaging: Makes boring updates fun.
 - Team-Oriented & Respectful.
 - Chill but Accountable.
-- He is the Sales Guy and Partner of CAS (Cloud Accountant Staffing)
         `;
       } else {
         return `
@@ -156,22 +201,15 @@
 - Clear & Direct.
 - Light Humor & Real Life.
 - Positive & Forward-Looking.
-- He is the CEO of CAS (Cloud Accountant Staffing)
         `;
       }
-    }
-
-    function addToHistory(input, voice, tone, result) {
-      const entry = document.createElement("div");
-      entry.className = "history-entry";
-      entry.innerHTML = `<strong>Voice:</strong> ${voice} | <strong>Tone:</strong> ${tone}<br><strong>Input:</strong> ${input}<br><strong>Output:</strong><br>${result}`;
-      historyLog.prepend(entry);
     }
 
     async function generatePost() {
       const input = document.getElementById("newIdea").value;
       const tone = document.getElementById("tone").value;
       const voice = document.getElementById("voice").value;
+      const output = document.getElementById("output");
 
       output.innerHTML = "Generating...";
 
@@ -207,8 +245,11 @@ Tone to Avoid:
 - Sounding like a scripted chatbot or AI assistant
 - Passive voice or overly complicated sentence structure
 
+Audience: CPA firm owners or accounting leaders considering offshore staffing.
 
 ${getToneTag(tone)}
+
+Write the content below using this voice and format appropriately. If it sounds like an email, write an email. If it sounds like a post, write a post.
 
 User input:
 "${input}"
@@ -224,9 +265,16 @@ Return only the final version — no intro, no explanation.
 
       const data = await response.json();
       const result = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating output.";
-
       output.innerHTML = result;
       addToHistory(input, voice, tone, result);
+    }
+
+    function addToHistory(input, voice, tone, result) {
+      const historyLog = document.getElementById("historyLog");
+      const entry = document.createElement("div");
+      entry.className = "history-entry";
+      entry.innerHTML = `<strong>Voice:</strong> ${voice} | <strong>Tone:</strong> ${tone}<br><strong>Input:</strong> ${input}<br><strong>Output:</strong><br>${result}`;
+      historyLog.prepend(entry);
     }
   </script>
 </body>
