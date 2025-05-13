@@ -1,7 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Jordan's Voice Rewriter</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewrite in Jordan's Voice</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+    h1 {
+      color: #4f46e5;
+      margin-bottom: 1rem;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    textarea, select, button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    #output {
+      white-space: pre-wrap;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+    }
+    .copy-button {
+      background: #22d3ee;
+      color: #111827;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      float: right;
+    }
+    .copy-button:hover {
+      background: #0ec7dd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rewrite in Jordan's Voice</h1>
+
+    <label for="rawPost">Raw Post</label>
+    <textarea id="rawPost" rows="6" placeholder="Paste your draft here..."></textarea>
+
+    <label for="tone">Select Additional Style</label>
+    <select id="tone">
+      <option value="No extra style">No extra style</option>
+      <option value="Friendly">Friendly</option>
+      <option value="Sharp">Sharp</option>
+      <option value="Funny">Funny</option>
+      <option value="Empathetic">Empathetic</option>
+      <option value="Professional">Professional</option>
+    </select>
+
+    <button onclick="rewritePost()">Rewrite Post</button>
+
+    <div id="output"></div>
+    <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+  </div>
+
   <script>
     async function rewritePost() {
       const rawPost = document.getElementById("rawPost").value;
@@ -9,7 +103,8 @@
       const output = document.getElementById("output");
       output.textContent = "Rewriting...";
 
-     const prompt = `
+      const prompt = `
+ const prompt = `
 You are a professional ghostwriter. Rewrite the LinkedIn post below using the following tone and voice guide.
 
 🔊 Jordan’s Voice & Tone Guide:
@@ -20,6 +115,16 @@ You are a professional ghostwriter. Rewrite the LinkedIn post below using the fo
 - Light Humor & Real Life: Mention small personal things or relatable metaphors. Use emojis where appropriate (🔥, 🎉). But dont overuse.
 - Positive & Forward-Looking: Maintain optimism, even when discussing problems or asking questions.
 
+Tone Guide:
+- No extra style: Jordan’s Voice & Tone Guide.
+- Sharp: Direct, punchy, confident. Less fluff.
+- Empathetic: Supportive, reflective, emotionally aware.
+- Funny: Use clever analogies, casual jokes, emoji play.
+- Friendly: Warm, open, kind language with a collaborative vibe.
+- Professional: Polished, respectful, a bit more formal but still human.
+
+Now rewrite this post using Jordan's voice + a strong layer of "${tone}" tone.
+
 Audience: CPA firm owners or accounting leaders considering offshore staffing.
 
 Your task:
@@ -29,7 +134,6 @@ Rewrite the following post to sound like it came from Jordan, using his tone gui
 
 Return only the revised version.
 `;
-
       const apiKey = "AIzaSyD3qTi0hFd0ezWE0iFiJSVjziteJqx5a_I"; // Replace with your actual key
 
       const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey, {
@@ -46,58 +150,15 @@ Return only the revised version.
       const rewritten = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating rewrite.";
       output.textContent = rewritten;
     }
+
+    function copyToClipboard() {
+      const text = document.getElementById("output").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      }, () => {
+        alert("Failed to copy text.");
+      });
+    }
   </script>
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: #f9f9f9;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    textarea, select, button {
-      width: 100%;
-      margin-top: 1rem;
-      padding: 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #0077cc;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #output {
-      white-space: pre-wrap;
-      margin-top: 2rem;
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-  </style>
-</head>
-<body>
-  <h1>Rewrite in Jordan's Voice</h1>
-  <label for="rawPost">Raw Post</label>
-  <textarea id="rawPost" rows="6" placeholder="Paste your draft here..."></textarea>
-
-  <label for="tone">Tone</label>
-<select id="tone">
-  <option value="No extra style">No extra style</option>
-  <option value="Friendly">Friendly</option>
-  <option value="Sharp">Sharp</option>
-  <option value="Funny">Funny</option>
-  <option value="Empathetic">Empathetic</option>
-  <option value="Professional">Professional</option>
-</select>
-
-  <button onclick="rewritePost()">Rewrite Post</button>
-
-  <div id="output"></div>
 </body>
 </html>
