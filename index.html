@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jordan's Voice Assistant</title>
+  <title>Voice Assistant</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -75,10 +75,16 @@
 </head>
 <body>
   <div class="container">
-    <h1>Jordan's Voice Assistant</h1>
+    <h1>Voice Assistant</h1>
 
     <label for="newIdea">🧠 What would you like to write or rewrite?</label>
     <textarea id="newIdea" rows="6" placeholder="Describe what you want to write (LinkedIn post, email, or paste a draft to rewrite)..."></textarea>
+
+    <label for="voice">🧑 Select a Voice</label>
+    <select id="voice">
+      <option value="Jordan">Jordan</option>
+      <option value="Conner">Conner</option>
+    </select>
 
     <label for="tone">🎨 Select a Tone (optional)</label>
     <select id="tone">
@@ -100,23 +106,22 @@
     const apiKey = "AIzaSyD3qTi0hFd0ezWE0iFiJSVjziteJqx5a_I"; // Replace with your actual key
 
     function getToneTag(tone) {
-      return tone !== "No extra style" ? ` with a touch of \"${tone}\" style` : "";
+      return tone !== "No extra style" ? `Apply an additional tone of \"${tone}\".` : "Use only the selected voice's natural tone.";
     }
 
-    async function generatePost() {
-      const input = document.getElementById("newIdea").value;
-      const tone = document.getElementById("tone").value;
-      const output = document.getElementById("output");
-      output.textContent = "Generating...";
-
-      const prompt = `
-You are a professional ghostwriter. Rewrite the LinkedIn post or email below using the following tone and voice guide.
-
-Your job is to generate or rewrite professional communication in Jordan’s voice. This might be:
-- A LinkedIn post
-- A marketing email
-- A client update
-
+    function getVoiceGuide(voice) {
+      if (voice === "Conner") {
+        return `
+🔊 Conner's Voice & Tone Guide:
+- Witty & Playful: Uses light humor, inside jokes, and casual pop culture references to keep things fun and human. Think emojis, playful phrasing, and the occasional jab (always in good spirit).
+- Straight to the Point: No fluff. Even when joking, he’s efficient and direct with the ask or update. Messages are short, actionable, and clear.
+- Casual & Relatable: Feels like a teammate, not a manager. Uses “hey” intros, lowercase styling, and natural language like he’s sending a quick Slack.
+- Creative & Engaging: Gives updates and announcements a little flair—makes even boring stuff feel interesting or fun to read.
+- Team-Oriented & Respectful: Never bossy or passive-aggressive. Frames requests as part of working together and improving things for everyone.
+- Chill but Accountable: Keeps a relaxed tone but expects things to get done—without micromanaging. Uses humor as a cushion but doesn’t dilute the message.
+        `;
+      } else {
+        return `
 🔊 Jordan's Voice & Tone Guide:
 - Conversational & Friendly: Natural, direct, human. Uses casual phrases like he is talking to a friend.
 - Humble & Curious: Avoid sounding like an expert; be open to learning and improving.
@@ -124,9 +129,24 @@ Your job is to generate or rewrite professional communication in Jordan’s voic
 - Clear & Direct: Get to the point quickly. Value should be obvious up front. Keeps it professional.
 - Light Humor & Real Life: Mention small personal things or relatable metaphors. Use emojis where appropriate (🔥, 🎉). But don’t overuse.
 - Positive & Forward-Looking: Maintain optimism, even when discussing problems or asking questions.
+        `;
+      }
+    }
+
+    async function generatePost() {
+      const input = document.getElementById("newIdea").value;
+      const tone = document.getElementById("tone").value;
+      const voice = document.getElementById("voice").value;
+      const output = document.getElementById("output");
+      output.textContent = "Generating...";
+
+      const prompt = `
+You are a professional ghostwriter. Rewrite or generate a post or email using the selected voice style.
+
+${getVoiceGuide(voice)}
 
 Tone Guide:
-- No extra style: Jordan's Voice & Tone Guide only.
+- No extra style: Use only the voice guide above.
 - Sharp: Direct, punchy, confident. Less fluff.
 - Empathetic: Supportive, reflective, emotionally aware.
 - Funny: Use clever analogies, casual jokes, emoji play.
@@ -151,9 +171,9 @@ Avoid tone that is:
 - Sounding like a scripted chatbot or AI assistant
 - Passive voice or overly complicated sentence structure
 
-${tone !== "No extra style" ? `Apply an additional tone of "${tone}".` : "Use only Jordan's natural voice."}
+${getToneTag(tone)}
 
-Write the content below using this voice and format appropriately. If it sounds like an email, write it as an email. If it sounds like a post, write a post.
+Write the content below using this voice and format appropriately. If it sounds like an email, write an email. If it sounds like a post, write a post.
 
 User input:
 "${input}"
